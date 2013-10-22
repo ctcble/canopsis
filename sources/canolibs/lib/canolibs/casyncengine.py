@@ -27,6 +27,8 @@ from cinit import cinit
 import traceback
 import cevent
 import cengine
+from cstorage import get_storage
+from caccount import caccount
 
 import itertools
 
@@ -40,7 +42,7 @@ RECORD_TYPE = 'crecord_type'
 ENABLE = 'enable'
 LOADED = 'loaded'
 
-class record_processor(threading.Thread):
+class recordprocessor(threading.Thread):
 	"""
 	Dedicated to process a set of records asynchronously with a parent casyncengine.
 	"""
@@ -48,49 +50,22 @@ class record_processor(threading.Thread):
 	"""
 	Default thread sleeping value between two record processes.
 	"""
-	DEFAULT_SLEEP = 0.5
+	DEFAULT_SLEEP = 0.1
+	DEFAULT_RECORD_COUNT_PER_PROCESSING = 3
 
-	def __init__(self, asyncengine, record_processing, sleep=DEFAULT_SLEEP):
+	def __init__(self, asyncengine, record_processing, record_count_per_processing=DEFAULT_RECORD_COUNT_PER_PROCESSING, sleep=DEFAULT_SLEEP):
 		threading.Thread.__init__(self)
-
-		self._records = []
-		self._asyncengine = asyncengine
-		self._lock = treading.Lock()
+		
+		self._asyncengine = asyncengine		
 		self._record_processing = record_processing
+		self._record_count_per_processing = record_count_per_processing
 		self._sleep = sleep
+
 		self._run = True
-		self._start()
+		self.start()
 
-	def add_record(self, record):
-		"""
-		Add a record to this record list
-		"""
-		self._lock.acquire()
-		self._records.append(record)
-		self._lock.release()
-
-	def contains_record(self, record):
-		"""
-		Return True iif this contains record.
-		"""
-		self._lock.acquire()
-		result = False
-		_id = record.get(ID)
-		for _record in self._records:
-			if _record.get(ID) == _id:
-				result = True
-				break
-		self._lock.release()
-		return result
-
-	def records_count(self):
-		"""
-		Returns records count.
-		"""
-		self._lock.acquire()
-		result = len(self._records)
-		self._lock.release()
-		return result
+	def set_record_processing_count_per_processing(self, record_count_per_processing):
+		self._record_count_per_processing = record_count_per_processing
 
 	def run(self):
 		"""
@@ -98,26 +73,15 @@ class record_processor(threading.Thread):
 		Pop records from this record list and process them while this is running.
 		"""
 		while self._run:
+			
+			records = self._asyncengine.pop_records(self._record_count_per_processing)
 
-			self._lock.acquire()
-			records_count = len(self._records)
-			self._lock.release()
-
-			if records_count > 0:
-
-				self._lock.acquite()
-				record = self._records.pop(0)
-				self._lock.release()
-				self._record_processing(record)
-				self._post_process_record(record)
-
-			if records_count == 1 :
-				time.sleep(self._sleep)
-
-		self._records = []
-
-	def _post_process_record(self, record):
-		self.asyncengine.record_processor_has_processed_record(self, record)
+			if len(records) > 0:
+				for record in records:							
+					self._record_processing(record)
+					self.asyncengine.processed_record(self, record)
+			else:
+				time.sleep(self._sleep)		
 
 	def stop(self):
 		"""
@@ -136,66 +100,87 @@ class casyncengine(cengine.cengine):
 
 	def __init__(self,
 			record_processing,
-			record_type,
+			record_type_name,
 			record_processing_sleep=recordprocessor.DEFAULT_SLEEP,
+			record_processor_count=DEFAULT_RECORD_PROCESSOR_COUNT,
 			next_amqp_queues=[],
 			next_balanced=False,
 			name="worker1",
 			beat_interval=60,
 			logging_level=logging.INFO,
 			exchange_name='amq.direct',
-			routing_keys=[],
-			n_record_processors=DEFAULT_RECORD_PROCESSOR_COUNT):
+			routing_keys=[]):
 		
 		cengine.cengine.__init__(self, next_amqp_queues, next_balanced, name, beat_interval, logging_level, exchange_name, routing_keys)
 	
+		self._lock = threading.Lock()
+		self._records = []
 		self._record_processing = record_processing
-		self._n_record_processors = 0
-		self.set_record_processor_count(n_record_processors)
 		self._record_processing_sleep = record_processing_sleep
-		self._record_type = record_type
-		self._record_processors = [recordprocessor(record_processing=self._record_processing, sleep=record_processing_sleep)] * self._n_record_processors
+		self._record_type_name = record_type_name		
+		self._record_processors = []
+		self.set_record_processor_count(record_processor_count)
+
+		self._processed_records = self._beat_processed_records = 0
+
+	def pre_run(self):
+		self.storage = get_storage(namespace='object', account=caccount(user="root", group="root"))
+
+	def pop_records(self, count=1):
+		"""
+		Return poped records.
+		"""		
+		
+		result = []
+
+		if count == -1 :
+			count = len(self._records)
+		self._lock.acquire()
+		result = self._records[0: count]
+		self._records = self._records[count:]
+		self._lock.release()
+		
+		return result
 
 	def beat(self):
 		"""
 		Every beat_interval, get records from database and give them to record_processors.
 		"""
-		records = self.storage.find({RECORD_TYPE: self._record_type, ENABLE: True}, namespace="object")		
-
-		for record in self._records:
-			if not self._is_record_processing(record):
-				self._record_processors[0].add_record(record)
-				self._update_record_processors()
-
-	def _is_record_processing(self, record):
-		for record_processor in self._record_processors:
-			if record_processor.contains_record(record):
-				return True
-		return False
-
-	def _update_record_processors(self):
-		sorted(self._record_processors, cmp= lambda x, y: x.records_count() - y.records_count())
-			
-	def record_processor_has_processed_record(self, record_processor, record):
+		self._beat_processed_records = 0
+		self.load_records()
+	
+	def processed_record(self, record_processor, record):
 		"""
 		Notify this an input record_processor has finished to process an input record.
 		"""
-		self._update_record_processors()
+		self._processed_records += 1
+		self._beat_processed_records += 1		
 
 	def load_records(self):
 		"""
 		Load records in self._records
 		"""
-		self._records = []
-		_records_json = self.storage.find({RECORD_TYPE: self._record_type, ENABLE: True}, namespace="object")
+		_records_json = self.storage.find({RECORD_TYPE: self._record_type_name, ENABLE: True}, namespace="object")
 		
 		for	_record_json in _records_json:
 			# let say selector is loaded
 			self.storage.update(_record_json._id, {LOADED: True})
-			record = self.new_record(_record_json)
+			record = self._get_record(_record_json)
+			sel._try_to_add_record(record)
+			
+	def _try_to_add_record(self, record):
+		_id = record.get(ID)
+		toAdd = True
+		self._lock.acquire()
+		for _record in self._records:
+			if _record.get(ID)==_id:
+				toAdd = False
+				break
+		if toAdd:
 			self._records.append(record)
+		self._lock.release()
 
-	def new_record(self, record):
+	def _get_record(self, record):
 		"""
 		Create a new records related to an input record (c.f. case for cselector).
 		"""
@@ -205,13 +190,13 @@ class casyncengine(cengine.cengine):
 		"""
 		Unload records of this type.
 		"""
-		records = self.storage.findAndModify(
+		self.storage.findAndModify(
 			{ 
 				'query': 
-					{'$and': [{RECORD_TYPE: self._record_type }, { LOADED :True}]},
+					{'$and': [{RECORD_TYPE: self._record_type_name }, { LOADED :True}]},
 				'update':
 					{ 'loaded': False }
-			}
+			},
 			namespace="object")
 		self.logger.debug('%i configuration unloaded' % len(records))
 
@@ -225,13 +210,18 @@ class casyncengine(cengine.cengine):
 		"""
 		Change the record processors list size.
 		"""
-		if self._n_record_processors < count:
-			for record_processor_index xrange(self._n_record_processors, count - self._n_record_processors):				
-				record_processor = recordprocessor(record_processing=self._record_processing, sleep=record_processing_sleep)
+		if count < 1:
+			raise Exception('new record processor count must be greater than 0: %s' % count)
+		record_processor_count = len(self._record_processors)
+		if record_processor_count < count:
+			for record_processor_index in xrange(record_processor_count, count - record_processor_count):				
+				record_processor = recordprocessor(asyncengine=self, record_processing=self._record_processing, sleep=self._record_processing_sleep)
 				record_processor.stop()
 				self._record_processors.append(record_processor)
-		elif self._n_record_processors > count:
-			for record_processor_index xrange(count, self._n_record_processors):
+		elif record_processor_count > count:			
+			for record_processor_index in xrange(record_processor_count - count):
 				record_processor = self._record_processors.pop()
 				record_processor.stop()
-		self._n_record_processors = count
+
+	def get_record_processors(self):
+		return self._record_processors
