@@ -1311,7 +1311,7 @@ Ext.define('canopsis.lib.controller.cgrid', {
 											if ( rec.raw['event_type'] == 'ack' ) {
 												ans = false;
 											} else {
-												if ( rec.raw['rk'] == event_ack['ref_rk'] )  {
+												if ( typeof event_ack != "undefined" && rec.raw['rk'] == event_ack['ref_rk'] )  {
 													rec.raw['ack_state'] = event_ack['state']
 													rec.raw['ack_output'] = event_ack['output']
 												} 

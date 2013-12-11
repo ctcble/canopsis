@@ -149,7 +149,7 @@ Ext.define('canopsis.lib.view.cgrid_state' , {
 				header: 'Ticket',
 				sortable: this.opt_column_sortable,
 				flex: 1,
-				dataIndex: 'state_type',
+				dataIndex: 'ticket',
 				renderer: rdr_ticket
 			});
 		}

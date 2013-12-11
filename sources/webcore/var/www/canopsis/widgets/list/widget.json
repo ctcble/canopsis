@@ -39,7 +39,7 @@
 								"xtype": "checkbox",
 								"boxLabel": "Ticket",
 								"checked": false,
-								"name": "show_file_ticket"
+								"name": "show_ticket"
 							},{
 								"xtype": "checkbox",
 								"boxLabel": "State type",
@@ -130,6 +130,11 @@
 						"title": "Console de supervision",
 						"items":[
 							{
+								"xtype": "checkbox",
+								"boxLabel": "Double Clic Tab Open",
+								"name": "show_consolesup",
+								"checked": false
+							},{
 								"xtype": "textfield",
 								"fieldLabel": "Help File URL",
 								"name": "file_help_url",
