@@ -1,3 +1,4 @@
+//need:app/lib/view/cwidget.js,app/lib/view/cgrid_state.js,app/lib/controller/cgrid.js
 /*
 #--------------------------------
 # Copyright (c) 2011 "Capensis" [http://www.capensis.com]
@@ -23,6 +24,11 @@ Ext.define('widgets.list.list' , {
 
 	alias: 'widget.list',
 
+	requires: [
+		'canopsis.lib.view.cgrid_state',
+		'canopsis.lib.controller.cgrid'
+	],
+
 	//don't work
 	filter: {'source_type': 'component'},
 
@@ -36,9 +42,9 @@ Ext.define('widgets.list.list' , {
 	show_last_check: true,
 	show_output: true,
 	show_tags: false,
-	show_file_help: true,
-	show_file_equipement: true,
-	show_ticket: true,
+	show_file_help: false,
+	show_file_equipement: false,
+	show_ticket: false,
 	show_ack: true,
 	show_help_msg: true,
 	
@@ -46,11 +52,11 @@ Ext.define('widgets.list.list' , {
 	
 	show_form_edit: false,
 	show_edit_state: true,
-	show_edit_state_type: true,
+	show_edit_state_type: false,
 	show_edit_ticket: true,
 	show_edit_output: true,
 
-	show_consolesup: true,
+	show_consolesup: false,
 
 	paging: true,
 	bar_search: true,

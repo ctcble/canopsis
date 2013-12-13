@@ -1,3 +1,4 @@
+//need:app/lib/form/cfield.js
 /*
 # Copyright (c) 2011 "Capensis" [http://www.capensis.com]
 #
@@ -90,12 +91,15 @@ Ext.define('canopsis.lib.form.field.ctopo' , {
 
 				for(var j = 0; j < node.conns.length; j++) {
 					var conn = node.conns[j];
-					var target = Ext.getCmp(conn.targetId);
-					var source = Ext.getCmp(conn.sourceId);
 
-					if(target && source) {
-						log.debug('   -> ' + source.id, this.logAuthor);
-						conns.push([source.id, target.id]);
+					if(conn) {
+						var target = Ext.getCmp(conn.targetId);
+						var source = Ext.getCmp(conn.sourceId);
+
+						if(target && source) {
+							log.debug('   -> ' + source.id, this.logAuthor);
+							conns.push([source.id, target.id]);
+						}
 					}
 				}
 
@@ -315,7 +319,7 @@ Ext.define('canopsis.lib.form.field.ctopo' , {
 		var source = Ext.getCmp(c.sourceId);
 
 		for(var i = 0; i < target.conns.length; i++) {
-			if(target.conns[i].connection.id === c.id) {
+			if(target.conns[i] && target.conns[i].connection && target.conns[i].connection.id === c.id) {
 				delete (target.conns[i]);
 			}
 		}

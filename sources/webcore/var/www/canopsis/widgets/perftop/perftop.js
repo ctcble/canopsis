@@ -1,3 +1,4 @@
+//need:app/lib/view/cwidget.js,app/store/Perfdatas.js,app/lib/view/cgrid.js
 /*
 # Copyright (c) 2011 "Capensis" [http://www.capensis.com]
 #
@@ -20,6 +21,11 @@ Ext.define('widgets.perftop.perftop' , {
 	extend: 'canopsis.lib.view.cwidget',
 
 	alias: 'widget.perftop',
+
+	requires: [
+		'canopsis.store.Perfdatas',
+		'canopsis.lib.view.cgrid'
+	],
 
 	//Default options
 	limit: 10,
@@ -137,7 +143,7 @@ Ext.define('widgets.perftop.perftop' , {
 					renderer: function(value, metaData, record) {
 						void(metaData);
 
-						var me = this.cwidget;
+						var me = this.cwidget();
 						var unit = record.get('u');
 
 						if(me.humanReadable) {
@@ -208,6 +214,8 @@ Ext.define('widgets.perftop.perftop' , {
 				});
 			}
 
+			var me = this;
+
 			this.grid = Ext.create('canopsis.lib.view.cgrid', {
 				model: 'Perfdata',
 				store: this.store,
@@ -227,7 +235,9 @@ Ext.define('widgets.perftop.perftop' , {
 				opt_cell_edit: false,
 
 				columns: this.columns,
-				cwidget: this
+				cwidget: function() {
+					return me;
+				}
 			});
 
 			this.wcontainer.removeAll();

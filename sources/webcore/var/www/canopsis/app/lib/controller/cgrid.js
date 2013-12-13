@@ -1,3 +1,4 @@
+//need:app/lib/view/crights.js,app/lib/view/cauthkey.js
 /*
 # Copyright (c) 2011 "Capensis" [http://www.capensis.com]
 #
@@ -18,6 +19,11 @@
 */
 Ext.define('canopsis.lib.controller.cgrid', {
 	extend: 'Ext.app.Controller',
+
+	requires: [
+		'canopsis.lib.view.crights',
+		'canopsis.lib.view.cauthkey'
+	],
 
 	allowEdit: true,
 
@@ -709,7 +715,7 @@ Ext.define('canopsis.lib.controller.cgrid', {
 				form = Ext.getCmp(id);
 
 				if(form) {
-					log.debug("Window '" + id + "' allready open, just show it", this.logAuthor);
+					log.debug("Window '" + id + "' already open, just show it", this.logAuthor);
 					form.win.show();
 
 					return form;
@@ -891,7 +897,7 @@ Ext.define('canopsis.lib.controller.cgrid', {
 					var tab = Ext.getCmp(id);
 
 					if(tab) {
-						log.debug("Tab '" + id + "'allerady open, just show it", this.logAuthor);
+						log.debug("Tab '" + id + "'already open, just show it", this.logAuthor);
 						main_tabs.setActiveTab(tab);
 					}
 					else {
@@ -1106,6 +1112,8 @@ Ext.define('canopsis.lib.controller.cgrid', {
 		var selection = this.grid.getSelectionModel().getSelection();
 
 		if ( selection.length > 0 ) {
+			if ( selection.length == 1 ) { record = selection[0]; }
+
 			var tabFormAck;	
 			if ( this.grid.opt_show_form_ack && ( this.grid.opt_show_ack_state_solved || this.grid.opt_show_ack_state_pendingsolved || this.grid.opt_show_ack_state_pendingaction || this.grid.opt_show_ack_state_pendingvalidation ) ) {
 				tabFormAck = {
@@ -1197,7 +1205,7 @@ Ext.define('canopsis.lib.controller.cgrid', {
 						anchor:'95%'
 					});
 				}
-				if ( selection.length == 1 && his.grid.opt_show_edit_state ) {
+				if ( selection.length == 1 && this.grid.opt_show_edit_state ) {
 					tabFormEdit['items'][0]['items'].push({
 						xtype: 'combo',
 						fieldLabel: _('State'),
@@ -1257,7 +1265,7 @@ Ext.define('canopsis.lib.controller.cgrid', {
 									event = selection[i];
 
 									//Update event
-									if ( tabFormEdit && ( selection.length == 1 || ( selection.length != 1 && ( Ext.getCmp('tabFormEdit').getForm().getValues()['ticket'] != '' || Ext.getCmp('tabFormEdit').getForm().getValues()['ticket'] != null )  ) {
+									if ( tabFormEdit && ( selection.length == 1 || ( selection.length != 1 && ( Ext.getCmp('tabFormEdit').getForm().getValues()['ticket'] != '' || Ext.getCmp('tabFormEdit').getForm().getValues()['ticket'] != null ) ) ) ) {
 										for( item in Ext.getCmp('tabFormEdit').getForm().getValues() ){
 											event['data'][item] = Ext.getCmp('tabFormEdit').getForm().getValues()[item];
 										}	
@@ -1292,25 +1300,30 @@ Ext.define('canopsis.lib.controller.cgrid', {
 
 								//Destroy
 								manageEvent.destroy();
-								
-								//Reload Store
-								//dataview.store.load();
-								dataview.store.filter( function(rec, id) {
-									var ans;
-									if ( rec.raw['event_type'] == 'ack' ) {
-										ans = false;
-									} else {
-										if ( rec.raw['rk'] == event_ack['ref_rk'] )  {
-											rec.raw['ack_state'] = event_ack['state']
-											rec.raw['ack_output'] = event_ack['output']
-										} 
-										ans = true;
-									}
-									return ans
-								}, dataview.store );
 
+								setTimeout(
+									function() {
+										//Reload Store
+										dataview = dataview.findParentByType( 'grid' );
+										dataview.store.load();
+										dataview.store.filter( function(rec, id) {
+											var ans;
+											if ( rec.raw['event_type'] == 'ack' ) {
+												ans = false;
+											} else {
+												if ( rec.raw['rk'] == event_ack['ref_rk'] )  {
+													rec.raw['ack_state'] = event_ack['state']
+													rec.raw['ack_output'] = event_ack['output']
+												} 
+												ans = true;
+											}
+											return ans
+										}, dataview.store );
+									}, 500
+								);
+								
 								//Refresh dataview
-								dataview.refresh();
+								//dataview.refresh();
 							}
 						}],
 					}

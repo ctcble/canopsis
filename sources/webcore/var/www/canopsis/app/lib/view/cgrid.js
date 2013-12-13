@@ -1,3 +1,4 @@
+//need:app/lib/form/field/cdate.js,app/controller/common.js
 /*
 #--------------------------------
 # Copyright (c) 2011 "Capensis" [http://www.capensis.com]
@@ -25,7 +26,8 @@ Ext.define('canopsis.lib.view.cgrid' , {
 		'Ext.grid.plugin.CellEditing',
 		'Ext.form.field.Text',
 		'Ext.toolbar.TextItem',
-		'canopsis.lib.form.field.cdate'
+		'canopsis.lib.form.field.cdate',
+		'canopsis.controller.common'
 	],
 
 	// Options
@@ -87,6 +89,22 @@ Ext.define('canopsis.lib.view.cgrid' , {
 
 	logAuthor: '[view][cgrid]',
 
+	listeners: {
+		selectionchange: function(selectionModel, selected) {
+			if(this.opt_export_import) {
+				var store = selectionModel.getStore();
+				var all_selected = selected.length == store.count();
+
+				var cb = Ext.getCmp(this.cb_select_all_id);
+
+				if(cb.getValue() != all_selected) {
+					cb.onSelectionChange = true;
+					cb.setValue(all_selected);
+				}
+			}
+		}
+	},
+
 	getTbar: function() {
 		var dockedItems = this.getDockedItems();
 		for (var i=0;i < dockedItems.length;i++) {
@@ -113,6 +131,7 @@ Ext.define('canopsis.lib.view.cgrid' , {
 			});
 			this.features.push(groupingFeature);
 		}*/
+		this.cb_select_all_id = Ext.id();
 
 		// Multi select
 		if (this.opt_multiSelect == true)
@@ -185,84 +204,149 @@ Ext.define('canopsis.lib.view.cgrid' , {
 				}
 
 				if (this.opt_bar_customs) {
-					bar_child = bar_child.concat(this.opt_bar_customs);
-				}
+					//This option manages import and export functions for a grid object system
+					if (this.opt_export_import) {
+						var model = this.model;
+						var gridView = this;
 
-				if (this.opt_bar_time_search) {
-					//bar_child.push({ xtype: 'tbspacer', width: 150 })
-					bar_child.push('-');
+						bar_child.push({
+							xtype: 'button',
+							iconCls: 'icon-import',
+							text: _('Import '+ this.model),
+							disabled: false,
+							action: 'import',
+							handler: function() {
+								var controller_common = Ext.create('canopsis.controller.common');
+								controller_common.filepopup(gridView, model);
+							},
+						});
 
-					var yesterday =  new Date();
- 					yesterday.setDate(yesterday.getDate()-1);
+						bar_child.push({
+							xtype: 'button',
+							iconCls: 'icon-export',
+							text: _('Export '+ this.model),
+							disabled: false,
+							action: 'export',
+							handler: function() {
+								var selection = gridView.getSelectionModel().getSelection();
 
-					bar_child.push({
-						xtype: 'cdate',
-						name: 'startTimeSearch',
-						date_value: yesterday
-					});
+								log.debug('Exporting selection:', gridView.logAuthor);
+								log.dump(selection);
 
-					bar_child.push({
-						xtype: 'cdate',
-						name: 'endTimeSearch',
-						now: true
-					});
+								var data = [];
 
-					bar_child.push({
-						xtype: 'button',
-						//text: _('TimeDisplay'),
-						iconCls: 'icon-search',
-						action: 'search'
-					});
-				}
+								for(var i = 0; i < selection.length; i++) {
+									data.push({
+										name: 'ids',
+										value: selection[i].data._id
+									});
+								}
 
-				if (this.opt_bar_search) {
-					bar_child.push({xtype: 'tbfill'});
+								postDataToURL('/ui/export/objects', data);
+							}
+						});
 
-					bar_child = bar_child.concat(this.bar_search);
+						bar_child.push({
+							xtype: 'checkboxfield',
+							id: this.cb_select_all_id,
+							boxLabel: _('Select all'),
+							onSelectionChange: false,
+							handler: function(checkbox, checked) {
+								if(!checkbox.onSelectionChange) {
+									if(checked) {
+										gridView.getSelectionModel().selectAll();
+									}
+									else {
+										gridView.getSelectionModel().deselectAll();
+									}
+								}
 
-					bar_child.push({
-						xtype: 'button',
-						action: 'clean_search',
-						//text: _('Search'),
-						iconCls: 'icon-clean',
-						pack: 'end'
-					});
-					bar_child.push({
-						xtype: 'textfield',
-						isFormField: false,
-						name: 'searchField',
-						hideLabel: true,
-						width: 200,
-						pack: 'end'
-					});
-					bar_child.push({
-						xtype: 'button',
-						action: 'search',
-						//text: _('Search'),
-						iconCls: 'icon-search',
-						pack: 'end'
-					});
+								checkbox.onSelectionChange = false;
+							}
+						});
+					}
 
-				}
 
-				if (this.opt_bar_download) {
-					bar_child.push({
-						xtype: 'button',
-						//text: _('Download'),
-						iconCls: 'icon-download',
-						action: 'download'
-					});
-				}
+					if(this.opt_bar_customs) {
+						bar_child = bar_child.concat(this.opt_bar_customs);
+					}
 
-				// Creating toolbar
-				if (this.opt_bar_bottom) {
-					this.bbar = Ext.create('Ext.toolbar.Toolbar', {
-						items: bar_child
-					});
-				}else {
-					this.tbar = Ext.create('Ext.toolbar.Toolbar', {
-						items: bar_child
-					});
+					if (this.opt_bar_time_search) {
+						//bar_child.push({ xtype: 'tbspacer', width: 150 })
+						bar_child.push('-');
+
+						var yesterday =  new Date();
+						yesterday.setDate(yesterday.getDate()-1);
+
+						bar_child.push({
+							xtype: 'cdate',
+							name: 'startTimeSearch',
+							date_value: yesterday
+						});
+
+						bar_child.push({
+							xtype: 'cdate',
+							name: 'endTimeSearch',
+							now: true
+						});
+
+						bar_child.push({
+							xtype: 'button',
+							//text: _('TimeDisplay'),
+							iconCls: 'icon-search',
+							action: 'search'
+						});
+					}
+
+					if (this.opt_bar_search) {
+						bar_child.push({xtype: 'tbfill'});
+
+						bar_child = bar_child.concat(this.bar_search);
+
+						bar_child.push({
+							xtype: 'button',
+							action: 'clean_search',
+							//text: _('Search'),
+							iconCls: 'icon-clean',
+							pack: 'end'
+						});
+						bar_child.push({
+							xtype: 'textfield',
+							isFormField: false,
+							name: 'searchField',
+							hideLabel: true,
+							width: 200,
+							pack: 'end'
+						});
+						bar_child.push({
+							xtype: 'button',
+							action: 'search',
+							//text: _('Search'),
+							iconCls: 'icon-search',
+							pack: 'end'
+						});
+
+					}
+
+					if (this.opt_bar_download) {
+						bar_child.push({
+							xtype: 'button',
+							//text: _('Download'),
+							iconCls: 'icon-download',
+							action: 'download'
+						});
+					}
+
+					// Creating toolbar
+					if (this.opt_bar_bottom) {
+						this.bbar = Ext.create('Ext.toolbar.Toolbar', {
+							items: bar_child
+						});
+					}else {
+						this.tbar = Ext.create('Ext.toolbar.Toolbar', {
+							items: bar_child
+						});
+					}
 				}
 			}
 

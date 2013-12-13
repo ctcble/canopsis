@@ -1,3 +1,4 @@
+//need:app/lib/view/cwidget.js
 /*
 # Copyright (c) 2011 "Capensis" [http://www.capensis.com]
 #
@@ -149,7 +150,10 @@ Ext.define('widgets.gauge.gauge' , {
 		log.debug('Gauge options:', this.logAuthor);
 		log.dump(opts);
 
-		opts['cwidget'] = this;
+		opts['cwidget'] = function() {
+			return me;
+		};
+
 		this.gauge = new JustGage(opts);
 	},
 
