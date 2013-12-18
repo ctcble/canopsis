@@ -151,28 +151,25 @@ def rest_trees_get(rk=None):
 		}
 
 #### GET
-def rest_get(namespace, ctype=None, _id=None, params=None):
+def rest_get(	namespace,
+				ctype=None,
+				_id=None,
+				params=None,
+				limit=20,
+				page=0,
+				start=0,
+				groups=None,
+				search=None,
+				filter=None,
+				sort=None,
+				query=None,
+				onlyWritable=False,
+				noInternal=False,
+				ids=[],
+				fields= None):
+
 	#get the session (security)
 	account = get_account()
-
-	limit		= int(params.get('limit', default=20))
-	page		= int(params.get('page', default=0))
-	start		= int(params.get('start', default=0))
-	groups		= params.get('groups', default=None)
-	search		= params.get('search', default=None)
-	filter		= params.get('filter', default=None)
-	sort		= params.get('sort', default=None)
-	query		= params.get('query', default=None)
-	onlyWritable	= params.get('onlyWritable', default=False)
-	noInternal	= params.get('noInternal', default=False)
-	ids			= params.get('ids', default=[])
-
-	get_id			= request.params.get('_id', default=None)
-
-	fields = request.params.get('fields', default=None)
-
-	if not _id and get_id:
-		_id  = get_id
 
 	if not isinstance(ids, list):
 		try:
