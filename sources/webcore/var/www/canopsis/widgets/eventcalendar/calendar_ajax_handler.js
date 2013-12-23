@@ -29,9 +29,9 @@ Ext.define('widgets.eventcalendar.calendar_ajax_handler' , {
 	computeStackedUrl: function(start, end){
 		if(!!this.calendar.stacked_events_filter)
 		{
-			var url = "/rest/events?_dc=1383151536066&limit=2000";
+			var url = "/events_history/"+ start +"/"+ end +"?_dc=1383151536066";
 
-			var filter = this.computeTagsFilter(start, end);
+			var filter = this.computeStackedEventsFilter(start, end);
 			url += "&filter=";
 			url += JSON.stringify(filter);
 
@@ -40,7 +40,7 @@ Ext.define('widgets.eventcalendar.calendar_ajax_handler' , {
 		return null;
 	},
 
-	computeTagsFilter: function(from, to) {
+	computeStackedEventsFilter: function(from, to) {
 		if(!!this.calendar.stacked_events_filter)
 		{
 			return JSON.parse(this.calendar.stacked_events_filter);

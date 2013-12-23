@@ -85,25 +85,13 @@ Ext.define('widgets.eventcalendar.eventcalendar' , {
 	afterContainerRender: function() {
 		var calendarRoot = this;
 
-		var eventSources = [];
-
-		var tags_url = this.ajaxHandler.computeStackedUrl("!start!", "!end!");
-		var ics_url = this.ajaxHandler.computeIcsUrl("\"!start!\"", "\"!end!\"");
-		if(tags_url)
-			eventSources.push(tags_url);
-
-		if(ics_url)
-			eventSources = eventSources.concat(ics_url);
-
 		$('#' + calendarRoot.wcontainer.id).fullCalendar({
 			firstDay:1,
 			height: calendarRoot.wcontainer.height,
-			// eventSources: eventSources,
 			events: function(start, end, callback){
 				var events = [];
 				var start_unixTimestamp = new Date(start).getTime() / 1000;
 				var end_unixTimestamp = new Date(end).getTime() / 1000;
-				// events = events.concat(calendarRoot.getCalendarEvents(start_unixTimestamp, end_unixTimestamp, callback));
 				calendarRoot.ajaxHandler.getStackedEvents(start_unixTimestamp, end_unixTimestamp, callback);
 			},
 			defaultView: this.defaultView,
