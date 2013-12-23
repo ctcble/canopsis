@@ -41,36 +41,59 @@ from libexec.rest import *
 @get('/events_history/:start/:stop')
 def events_history_route(start, stop):
 	print "events_history_route"
+	print start
+	print stop
 	return events_history(	start=start,
 							stop=stop,
 							filter=request.params.get('filter', default=None))
 
 def events_history(start, stop, filter):
-	print "event history@begin"
+	def add_start_stop_params_to_filter(filter, start, stop):
+		print "add_start_stop_params_to_filter"
+
+		print start
+		print stop
+
+		start = int(start)
+		stop = int(stop)
+
+		filter = json.loads(filter)
+		print "load ok"
+		if filter.keys()[0] == "$and":
+			filter["$and"].append({"timestamp": { "$gt": start }})
+			filter["$and"].append({"timestamp": { "$lt": stop }})
+			return json.dumps(filter)
+		else:
+			new_filter = { "$and" : []}
+			new_filter["$and"].append(filter)
+			new_filter["$and"].append({"timestamp": { "$gt": start }})
+			new_filter["$and"].append({"timestamp": { "$lt": stop }})
+			return json.dumps(new_filter)
 
 	if filter is None:
-		filter_events = "{'event_type': { '$nin' : ['calendar','check'] } }"
-		filter_events_history = "{'event_type': { '$in' : ['calendar','check'] } } } }"
+		filter_events = '{"event_type": { "$nin" : ["calendar","check"] } }'
+		filter_events_history = '{"event_type": { "$in" : ["calendar","check"] } }'
+		filter_events = add_start_stop_params_to_filter(filter_events, start, stop)
+		filter_events_history = add_start_stop_params_to_filter(filter_events_history, start, stop)
 	else:
-		filter_events = "{ $and { %s , {'event_type': { '$nin' : ['calendar','check'] } } } }".format(filter)
-		filter_events_history = "{ $and { %s , {'event_type': { '$in' : ['calendar','check'] } } } }".format(filter)
+		filter_events = '{ "$and" : [ {"event_type": { "$nin" : ["calendar","check"] } }, ' + filter + ' ] }'
+		filter_events_history = '{ "$and" : [ {"event_type": { "$in" : ["calendar","check"] } }, ' + filter + ' ] }'
+		filter_events = add_start_stop_params_to_filter(filter_events, start, stop)
+		filter_events_history = add_start_stop_params_to_filter(filter_events_history, start, stop)
 
-	history_request = rest_get("events_history", filter=filter_events_history)
+
+	print filter_events
+	print filter_events_history
+
 	events_request = rest_get("events", filter=filter_events)
+	history_request = rest_get("events_history", filter=filter_events_history)
 
-	print "event history1"
-	print history_request
-	print "event history2"
-	print events_request
+	for event in history_request["data"]:
+		event["rk"]
+		# del event["rk"]
+		events_request["data"].append(event)
 
+	events_request["total"] += history_request["total"]
+	print events_request["total"]
 
-# http://stackoverflow.com/questions/14463087/is-it-possible-rename-fields-in-the-outputs-of-a-mongo-query-in-pymongo
-# db.article.aggregate(
-# { $project : {
-#     title : 1 ,
-#     page_views : "$pageViews" ,
-#     bar : "$other.foo"
-# }} );`
-	#requeter events en transformant _id en rk
-	#requeter history
-	#joindre les 2 tableaux
+	return events_request
