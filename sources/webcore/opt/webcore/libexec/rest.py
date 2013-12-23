@@ -48,6 +48,37 @@ ctype_to_group_access = {
 
 #########################################################################
 
+@get('/rest/:namespace/:ctype/:_id')
+@get('/rest/:namespace/:ctype')
+@get('/rest/:namespace')
+def rest_get_route(namespace, ctype=None, _id=None):
+	limit                = int(request.params.get('limit', default=20))
+	page                = int(request.params.get('page', default=0))
+	start                = int(request.params.get('start', default=0))
+	groups                = request.params.get('groups', default=None)
+	search                = request.params.get('search', default=None)
+	filter                = request.params.get('filter', default=None)
+	sort                = request.params.get('sort', default=None)
+	query                = request.params.get('query', default=None)
+	onlyWritable        = request.params.get('onlyWritable', default=False)
+	noInternal        = request.params.get('noInternal', default=False)
+	ids                        = request.params.get('ids', default=[])
+
+	return rest_get(namespace=namespace,
+					ctype=ctype,
+					_id=_id,
+					limit=limit,
+					page=page,
+					start=start,
+					groups=groups,
+					search=search,
+					filter=filter,
+					sort=sort,
+					query=query,
+					onlyWritable=onlyWritable,
+					noInternal=noInternal,
+					ids=ids)
+
 #### GET Media
 @get('/rest/media/:namespace/:_id')
 def rest_get_media(namespace, _id):
@@ -311,12 +342,6 @@ def rest_get(	namespace,
 	output={'total': total, 'success': True, 'data': output}
 
 	return output
-
-@get('/rest/:namespace/:ctype/:_id')
-@get('/rest/:namespace/:ctype')
-@get('/rest/:namespace')
-def rest_get_route(namespace, ctype=None, _id=None):
-	return rest_get(namespace, ctype, _id, request.params)
 
 #### POST
 @post('/rest/:namespace/:ctype/:_id')
