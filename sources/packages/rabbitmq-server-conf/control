@@ -22,41 +22,42 @@ function post_install(){
 
 	echo -n "Safe wait ..."
 
-	STATE=1
+	STATE=0
 	TRY=0
-	while [ $STATE -ne 0 ]; do
+	while [ $STATE -ne 1 ]; do
 	    if [ $TRY -eq 30 ]; then
 	        break
 	    fi
 	    sleep 1
-	    launch_cmd 0 "rabbitmqadmin -H 127.0.0.1 list nodes" &> /dev/null
-	    STATE=$?
+		$STATE=`service rabbitmq-server status | grep RUNNING | wc -l`
 	    TRY=$((TRY + 1))
 	    echo -n "."
 	done
 	echo
-	check_code $STATE "Failed to join API ..."
+	check_code $STATE "Failed to test rabbit service ..."
 	sleep 1
 
 	CODE=0
 	echo " + Declare Admin user ..."
-	$PREFIX/bin/rabbitmqadmin -H 127.0.0.1 declare user name=admin password=admin tags=administrator
+	$PREFIX/bin/rabbitmqctl add_user admin admin
+	$PREFIX/bin/rabbitmqctl set_user_tags admin administrator
 	RCODE=$?
 	if [ $RCODE -ne 0 ]; then CODE=$RCODE; fi
+	
+	VHOST_EXISTS=`rabbitmqctl list_vhosts | grep canopsis | wc -l`
 
-	echo " + Declare vhost ..."
-	$PREFIX/bin/rabbitmqadmin -H 127.0.0.1 declare vhost name=canopsis
-	RCODE=$?
-	if [ $RCODE -ne 0 ]; then CODE=$RCODE; fi
+	if [ $VHOST_EXISTS -ne 1 ]
+	then
+		echo " + Declare vhost ..."
+		$PREFIX/bin/rabbitmqctl add_vhost canopsis
+		RCODE=$?
+		if [ $RCODE -ne 0 ]; then CODE=$RCODE; fi
 
-	echo " + Declare permissions for guest user ..."
-	$PREFIX/bin/rabbitmqadmin -H 127.0.0.1 -V canopsis declare permission vhost=canopsis user=guest configure=".*" write=".*" read=".*"
-	RCODE=$?
-	if [ $RCODE -ne 0 ]; then CODE=$RCODE; fi
-
-	#echo " + Remove old queues ..."
-	#$PREFIX/bin/rabbitmqadmin -H 127.0.0.1 --vhost=canopsis --username=guest --password=guest delete queue name="amqp2engines" &> /dev/null
-	#$PREFIX/bin/rabbitmqadmin -H 127.0.0.1 --vhost=canopsis --username=guest --password=guest delete queue name="amqp2engines_alerts" &> /dev/null
+		echo " + Declare permissions for guest user ..."
+		$PREFIX/bin/rabbitmqctl set_permissions -p canopsis guest ".*" ".*" ".*"
+		RCODE=$?
+		if [ $RCODE -ne 0 ]; then CODE=$RCODE; fi
+	fi
 
 	launch_cmd 1 service rabbitmq-server stop
 
