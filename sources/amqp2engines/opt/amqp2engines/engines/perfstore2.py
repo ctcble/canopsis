@@ -19,7 +19,6 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 
-import pyperfstore2
 import time
 import logging
 
@@ -44,6 +43,7 @@ class engine(cengine):
 		cengine.__init__(self, name=NAME, *args, **kargs)
 
 		self.beat_interval = 10
+		self.perfstore_cache = {}
 
 	def create_amqp_queue(self):
 		super(engine, self).create_amqp_queue()
@@ -59,7 +59,15 @@ class engine(cengine):
 		pass
 
 	def beat(self):
-		self.logger.debug('event saved %s' % (self.event_count))
+		count = 0
+		
+		perfstore_cache = self.perfstore_cache
+		self.perfstore_cache = {}
+		for rk, metric in perfstore_cache:
+			count += 1
+			for item in perfstore_cache[(rk,metric)]:
+				self.backend.save(item)
+		self.logger.debug('metrics saved %s' % (count))
 
 	def work(self, event, *args, **kargs):
 		## Get perfdata
@@ -163,15 +171,20 @@ class engine(cengine):
 				'unit'		: unit,
 			}
 			
-			# This dictionary is for update purposes
 			metric_info = {'rk': event['rk'], 'me': metric}
+		
 			# This dictionary is for metrics db selection purpose
 			query = metric_info.copy()
 			 
 						
 			# Gets previous metric information from db
 			self.logger.debug('finding query : %s' % (metric_info))
-			last_values = self.backend.find_one(metric_info, sort=[('ts_max', pymongo.DESCENDING)])
+			# This dictionary is for cache purposes
+			if (event['rk'], metric) in self.perfstore_cache:
+				last_values = self.perfstore_cache[(event['rk'], metric)][-1]
+			else:
+				self.perfstore_cache[(event['rk'], metric)] = []
+				last_values = self.backend.find_one(metric_info, sort=[('ts_max', pymongo.DESCENDING)])
 
 			# Dictionnary that will set mongodb document to new values
 			keys_set = {'ts_max' : event['timestamp']}
@@ -187,13 +200,12 @@ class engine(cengine):
 				# Is previous document full
 				if last_values['values_count'] < METRIC_CONTENT_LIMIT:
 					# update query can retrieve 
-					query['ts_max'] = last_values['ts_max']
+					keys_set['_id'] 	= last_values['_id']
 					insert_document = False
 
 				else:
 					# Then a new one is beeing created 
 					last_values = metric_info
-
 
 
 			for metric_key in new_values:
@@ -217,12 +229,15 @@ class engine(cengine):
 				keys_set['values_count'] = 1
 				self.backend.insert(keys_set)
 				self.logger.debug('Metric values inserted')
+				# add to cache
+				self.perfstore_cache[(event['rk'], metric)].append(last_values)
 			else:
-				keys_set['value.' + str_timestamp] = value
-				self.backend.update(query, {'$set': keys_set, '$inc': {'values_count': 1}}, sort=[('ts_max', pymongo.DESCENDING)])
-				self.logger.debug(keys_set)
+						
+				keys_set['value'][str_timestamp] = value
+				keys_set['values_count'] += 1
 				self.logger.debug('Metric values updated')
 
 
 			self.logger.debug('last values updated for metric %s on document %s @ %s' % (metric, event['rk'], time.time() - self.time))
 			self.event_count += 1
+			
