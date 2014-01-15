@@ -21,17 +21,60 @@
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 import os.path
+from ConfigParser import RawConfigParser
 
 CONFIGURATION_DIRECTORY = '~/etc/'
+CONFIGURATION_FILE = 'configuration.conf'
+
+MANUAL_RECONFIGURATION = 'manual_reconfiguration'
+
+GLOBAL = 'GLOBAL'
 
 
 class _ConfigurationFileSystemEventHandler(FileSystemEventHandler):
+    """
+    File system handler which listen modification of configuration directory content
+    and notifies configuration file bound observers.
+    """
 
     def __init__(self):
-        self.configurationObservers = dict()
         super(_ConfigurationFileSystemEventHandler, self).__init__()
+        self.manual_configuration = True
+        self.configurationObservers = dict()
+        self.register_observer(
+            CONFIGURATION_FILE, self._check_configuration, True)
+
+    def _check_configuration(self, src_path):
+        """
+        Observer method.
+        """
+        conf = RawConfigParser()
+        conf.read()
+        manual_configuration = \
+            bool(
+                int(
+                    conf.get(GLOBAL, MANUAL_RECONFIGURATION)))
+        if not manual_configuration and self.manual_configuration:
+            self.manual_configuration = False
+            self.callObservers()
+        self.manual_configuration = manual_configuration
+
+    def callObservers(self):
+        """
+        Call all observers.
+        """
+        for configuration_file, observer in \
+                self.configurationObservers.iteritems():
+            src_path = os.path.absname(
+                os.path.join(CONFIGURATION_DIRECTORY, CONFIGURATION_FILE))
+            self._callObserver(src_path)
 
     def register_observer(self, configuration_file, observer, call=False):
+        """
+        Register an observer bound to input configuration_file.
+        If call is True, the observer is called just after registering.
+        """
+
         self.configurationObservers[configuration_file] = observer
         if call:
             src_path = os.path.join(
@@ -39,34 +82,59 @@ class _ConfigurationFileSystemEventHandler(FileSystemEventHandler):
             observer(src_path)
 
     def _callObserver(self, event):
+        """
+        Call observer bound to event src_path.
+        """
+
+        if self.manual_configuration:
+            return
         filename = os.path.basename(event.src_path)
         observer = self.configurationObservers.get(filename, None)
         if observer is not None:
             observer(event.src_path)
 
     def on_modified(self, event):
+        """
+        Call when a configuration file is modified.
+        """
+
         self._callObserver(event)
 
     def on_created(self, event):
+        """
+        Call when a configuration file is created.
+        """
+
         self._callObserver(event)
 
-_file_handler = _ConfigurationFileSystemEventHandler()
+# singleton for configuration file system event handler
+_file_system_event_handler = _ConfigurationFileSystemEventHandler()
+# watchdog observer which register the singleton _file_system_event_handler in configuration directory content modification observers.
 _observer = Observer()
 _observer.schedule(
-    _file_handler, path=CONFIGURATION_DIRECTORY, recursive=False)
+    _file_system_event_handler, path=CONFIGURATION_DIRECTORY, recursive=False)
 _observer.start()
 
 import gevent
 import signal
 
 
-def stop_observer():
+def _stop_observer():
+    """
+    Stop listening of configuration file event handler on configuration directory.
+    """
+
     _observer.stop()
     _observer.join()
 
-gevent.signal(signal.SIGTERM, stop_observer)
-gevent.signal(signal.SIGINT, stop_observer)
+# stop the listening activity of this configuration file event handler at the end of current processus.
+gevent.signal(signal.SIGTERM, _stop_observer)
+gevent.signal(signal.SIGINT, _stop_observer)
 
 
 def register_observer(configuration_file, observer, call=False):
-    _file_handler.register_observer(configuration_file, observer, call)
+    """
+    Shortcut method which register an observer and bound it with input configuration_file.
+    If call is True (False by default), the observer is called just after being registered.
+    """
+    _file_system_event_handler.register_observer(configuration_file, observer, call)

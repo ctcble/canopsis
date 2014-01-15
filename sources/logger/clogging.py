@@ -20,11 +20,7 @@
 
 LOGGING_CONFIGURATION_FILENAME = 'logging.conf'
 
-import logging.config
-
-
-def loggingConfigurationFileObserver(src_path):
-    logging.config.fileConfig(src_path)
+import logging
 
 
 class CanopsisLogger(logging.Logger):
@@ -34,15 +30,28 @@ class CanopsisLogger(logging.Logger):
 
     pass
 
-import logging
 logging.setLoggerClass(CanopsisLogger)
 
 # register file configuration changes into the global configuration file
+import logging.config
+
+
+def loggingConfigurationFileObserver(src_path):
+    """
+    Reuse configuration file in order to parameterize loggers.
+    """
+
+    logging.config.fileConfig(src_path)
+
 import cconfiguration
 cconfiguration.register_observer(
     LOGGING_CONFIGURATION_FILENAME, loggingConfigurationFileObserver, True)
 
 
 def getLogger(name=None):
+    """
+    redirection to logging.getLogger.
+    """
+
     result = logging.getLogger(name)
     return result
