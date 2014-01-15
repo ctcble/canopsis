@@ -23,7 +23,7 @@ from watchdog.observers import Observer
 import os.path
 from ConfigParser import RawConfigParser
 
-CONFIGURATION_DIRECTORY = '~/etc/'
+CONFIGURATION_DIRECTORY = os.path.expanduser('~/etc/')
 CONFIGURATION_FILE = 'configuration.conf'
 
 MANUAL_RECONFIGURATION = 'manual_reconfiguration'
@@ -38,9 +38,11 @@ class _ConfigurationFileSystemEventHandler(FileSystemEventHandler):
     """
 
     def __init__(self):
+
         super(_ConfigurationFileSystemEventHandler, self).__init__()
         self.manual_configuration = True
         self.configurationObservers = dict()
+        self.config_parser = RawConfigParser()
         self.register_observer(
             CONFIGURATION_FILE, self._check_configuration, True)
 
@@ -48,12 +50,12 @@ class _ConfigurationFileSystemEventHandler(FileSystemEventHandler):
         """
         Observer method.
         """
-        conf = RawConfigParser()
-        conf.read()
+        print src_path
+        self.config_parser.read(src_path)
+        print self.config_parser.sections()
+
         manual_configuration = \
-            bool(
-                int(
-                    conf.get(GLOBAL, MANUAL_RECONFIGURATION)))
+            self.config_parser.getboolean(GLOBAL, MANUAL_RECONFIGURATION)
         if not manual_configuration and self.manual_configuration:
             self.manual_configuration = False
             self.callObservers()
@@ -63,10 +65,11 @@ class _ConfigurationFileSystemEventHandler(FileSystemEventHandler):
         """
         Call all observers.
         """
+
         for configuration_file, observer in \
                 self.configurationObservers.iteritems():
-            src_path = os.path.absname(
-                os.path.join(CONFIGURATION_DIRECTORY, CONFIGURATION_FILE))
+            src_path = os.path.join(
+                CONFIGURATION_DIRECTORY, configuration_file)
             self._callObserver(src_path)
 
     def register_observer(self, configuration_file, observer, call=False):
@@ -76,36 +79,38 @@ class _ConfigurationFileSystemEventHandler(FileSystemEventHandler):
         """
 
         self.configurationObservers[configuration_file] = observer
+
         if call:
             src_path = os.path.join(
                 CONFIGURATION_DIRECTORY, configuration_file)
-            observer(src_path)
+            self._callObserver(src_path)
 
-    def _callObserver(self, event):
+    def _callObserver(self, src_path):
         """
         Call observer bound to event src_path.
         """
 
-        if self.manual_configuration:
-            return
-        filename = os.path.basename(event.src_path)
-        observer = self.configurationObservers.get(filename, None)
-        if observer is not None:
-            observer(event.src_path)
+        src_path = os.path.expanduser(src_path)
+
+        if not self.manual_configuration:
+            filename = os.path.basename(src_path)
+            observer = self.configurationObservers.get(filename, None)
+            if observer is not None:
+                observer(src_path)
 
     def on_modified(self, event):
         """
         Call when a configuration file is modified.
         """
 
-        self._callObserver(event)
+        self._callObserver(event.src_path)
 
     def on_created(self, event):
         """
         Call when a configuration file is created.
         """
 
-        self._callObserver(event)
+        self._callObserver(event.src_path)
 
 # singleton for configuration file system event handler
 _file_system_event_handler = _ConfigurationFileSystemEventHandler()
