@@ -18,24 +18,23 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 
-#import logging
 from crecord import crecord
 
 from ctools import calcul_pct
 import cevent
 
 from caccount import caccount
-#from cstorage import get_storage
 
 from bson.code import Code
 
 import time
 import json
-import logging
+import clogging
 
 
 class cselector(crecord):
-	def __init__(self, storage, _id=None, name=None, namespace='events', use_cache=True, record=None, cache_time=60, logging_level=None):
+
+	def __init__(self, storage, _id=None, name=None, namespace='events', use_cache=True, record=None, cache_time=60):
 		self.type = 'selector'
 		self.storage = storage
 
@@ -70,10 +69,8 @@ class cselector(crecord):
 
 		self._ids = None
 
-		self.logger = logging.getLogger('cselector')
-		if logging_level:
-			self.logger.setLevel(logging.INFO)#logging_level)
-
+		self.logger = clogging.getLogger('cselector')
+		
 		## Init
 		if not record:
 			try:
@@ -83,10 +80,10 @@ class cselector(crecord):
 
 		if record:
 			self.logger.debug("Init from record.")
-			crecord.__init__(self, record=record, storage=storage)
+			super(cselector, self).__init__(record=record, storage=storage)
 		else:
 			self.logger.debug("Init new record.")
-			crecord.__init__(self, name=name, _id=self._id, account=storage.account, type=self.type, storage=storage)
+			super(cselector, self).__init__(name=name, _id=self._id, account=storage.account, type=self.type, storage=storage)
 
 	def dump(self):
 		self.data['include_ids']	= self.include_ids

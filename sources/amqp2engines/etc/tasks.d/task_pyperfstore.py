@@ -18,21 +18,13 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 from celery.task import task
-from celery.task.sets import subtask
 from celerylibs import decorators
-
-from cinit import cinit
-
-import os, sys, json 
-import time
 
 import pyperfstore2
 
-init 	= cinit()
-logger 	= init.getLogger('Pyperfstore Task') 
 
 @task
 @decorators.log_task
 def rotate(account=None, owner=None):
-	manager = pyperfstore2.manager()
-	manager.rotateAll()
+    manager = pyperfstore2.manager()
+    manager.rotateAll()

@@ -40,9 +40,10 @@ DAEMON_NAME='ics2amqp'
 config_file=os.path.expanduser('~/etc/ics2amqp.conf')
 timestamps_file=os.path.expanduser('~/var/lib/ics2amqp/ics2amqp.timestamps')
 
+import clogging
 
 init 	= cinit()
-logger 	= init.getLogger(DAEMON_NAME)
+logger 	= clogging.getLogger(DAEMON_NAME)
 handler = init.getHandler(logger)
 
 sleep_time = 1

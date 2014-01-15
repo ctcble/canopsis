@@ -25,7 +25,6 @@ from crecord import crecord
 from caccount import caccount
 from cgroup import cgroup
 
-import logging
 import time
 import json
 #storage = cstorage.
@@ -34,9 +33,6 @@ STORAGE = None
 MYRECORD = None
 ID = None
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)s %(levelname)s %(message)s',
-                    )
 
 class KnownValues(unittest.TestCase): 
 	def setUp(self):
@@ -53,7 +49,7 @@ class KnownValues(unittest.TestCase):
 		
 	def test_01_Init(self):
 		global STORAGE
-		STORAGE = cstorage(self.user_account, namespace='unittest', logging_level=logging.DEBUG)
+		STORAGE = cstorage(self.user_account, namespace='unittest')
 
 		records = STORAGE.find(account=self.root_account)
 		STORAGE.remove(records, account=self.root_account)

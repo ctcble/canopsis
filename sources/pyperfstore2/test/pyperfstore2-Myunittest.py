@@ -19,13 +19,8 @@
 # ---------------------------------
 
 import unittest, sys,json
-import logging
 import time
 import random
-
-logging.basicConfig(level=logging.INFO,
-	format='%(name)s %(levelname)s %(message)s',
-)
 
 import pyperfstore2
 manager = None
@@ -53,7 +48,6 @@ class KnownValues(unittest.TestCase):
 		manager = pyperfstore2.manager(
 			mongo_collection='unittest_perfdata2',
 			dca_min_length=50,
-			logging_level=logging.DEBUG,
 			redis_db=1)
 		
 		manager.store.drop()

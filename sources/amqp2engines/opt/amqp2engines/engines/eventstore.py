@@ -28,7 +28,7 @@ class engine(cengine):
 	def __init__(self, *args, **kargs):
 		cengine.__init__(self, name=NAME, *args, **kargs)
 
-		self.archiver = carchiver(namespace='events',  autolog=True, logging_level=self.logging_level)
+		self.archiver = carchiver(namespace='events',  autolog=True)
 
 	def work(self, event, *args, **kargs):
 		event_id = event['rk']

@@ -18,12 +18,11 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 
-
 from ConfigParser import RawConfigParser, ConfigParser, ParsingError
 import importlib
 
 import unittest
-import time, json, logging
+import time, json, clogging
 
 from cinit import cinit
 
@@ -35,7 +34,7 @@ sys.path.append(os.path.expanduser('~/opt/amqp2engines/engines/'))
 DAEMON_NAME="amqp2engines"
 
 init 	= cinit()
-logger 	= init.getLogger(DAEMON_NAME, level="INFO")
+logger 	= clogging.getLogger(DAEMON_NAME)
 handler = init.getHandler(logger)
 
 engines=[]

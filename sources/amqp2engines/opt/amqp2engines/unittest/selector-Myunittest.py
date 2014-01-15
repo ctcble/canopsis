@@ -20,7 +20,6 @@
 
 import 	unittest
 import 	sys, os
-import 	logging
 from 	cstorage 	import get_storage
 from 	caccount 	import caccount
 from 	cselector 	import cselector
@@ -33,7 +32,7 @@ import selector
 class KnownValues(unittest.TestCase):
 	def setUp(self):
 		self.storage = get_storage(namespace='object', account=caccount(user="root", group="root"))
-		self.engine = selector.engine()#logging_level=logging.DEBUG
+		self.engine = selector.engine()
 		self.engine.storage = self.storage
 
 	def test_01_Init(self):
@@ -53,7 +52,7 @@ class KnownValues(unittest.TestCase):
 		self.assertTrue(self.engine.selector_refresh == {'selector.account.root.selectorTest': True})
 
 		from camqp import camqp
-		self.engine.amqp = camqp(logging_level=logging.INFO, logging_name="test selector engine")
+		self.engine.amqp = camqp(logging_name="test selector engine")
 
 		for event_append in xrange(10):
 			self.engine.beat()

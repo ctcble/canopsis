@@ -27,7 +27,7 @@ from caccount import caccount
 
 class cli(ccmd):
 	def __init__(self, prompt):
-		ccmd.__init__(self, prompt + 'sla')
+		super(cli, self).__init__(prompt + 'sla')
 
 
 def start_cli(prompt):

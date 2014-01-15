@@ -1,4 +1,3 @@
-from cinit import cinit
 from caccount import caccount
 from cstorage import cstorage
 from crecord import crecord
@@ -7,8 +6,10 @@ import time
 from camqp import camqp
 import cevent
 
-init 	= cinit()
-logger 	= init.getLogger('Task result to db') 
+import logging
+
+logger = logging.getLogger('Task result to db')
+
 
 def simple_decorator(decorator):
     def new_decorator(f):

@@ -1,3 +1,23 @@
+#!/usr/bin/env python
+#--------------------------------
+# Copyright (c) 2014 "Capensis" [http://www.capensis.com]
+#
+# This file is part of Canopsis.
+#
+# Canopsis is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Canopsis is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
+# ---------------------------------
+
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 import os.path
@@ -36,6 +56,17 @@ _observer.schedule(
     _file_handler, path=CONFIGURATION_DIRECTORY, recursive=False)
 _observer.start()
 
+import gevent
+import signal
 
-def register_observer(configuration_file, observer):
-    _file_handler.register_observer(configuration_file, observer)
+
+def stop_observer():
+    _observer.stop()
+    _observer.join()
+
+gevent.signal(signal.SIGTERM, stop_observer)
+gevent.signal(signal.SIGINT, stop_observer)
+
+
+def register_observer(configuration_file, observer, call=False):
+    _file_handler.register_observer(configuration_file, observer, call)

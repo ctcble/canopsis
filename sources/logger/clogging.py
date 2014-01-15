@@ -1,11 +1,29 @@
-import logging
-import logging.config
-import cconfiguration
+#!/usr/bin/env python
+#--------------------------------
+# Copyright (c) 2014 "Capensis" [http://www.capensis.com]
+#
+# This file is part of Canopsis.
+#
+# Canopsis is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Canopsis is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
+# ---------------------------------
 
 LOGGING_CONFIGURATION_FILENAME = 'logging.conf'
 
+import logging.config
 
-def openLoggingConfigurationFile(src_path):
+
+def loggingConfigurationFileObserver(src_path):
     logging.config.fileConfig(src_path)
 
 
@@ -16,8 +34,15 @@ class CanopsisLogger(logging.Logger):
 
     pass
 
+import logging
 logging.setLoggerClass(CanopsisLogger)
 
 # register file configuration changes into the global configuration file
+import cconfiguration
 cconfiguration.register_observer(
-    LOGGING_CONFIGURATION_FILENAME, openLoggingConfigurationFile, True)
+    LOGGING_CONFIGURATION_FILENAME, loggingConfigurationFileObserver, True)
+
+
+def getLogger(name=None):
+    result = logging.getLogger(name)
+    return result

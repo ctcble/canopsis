@@ -23,12 +23,11 @@ import sys, os, signal, json
 sys.path.append(os.path.expanduser('~/lib/canolibs'))
 
 from pwd import getpwnam
-from cinit import cinit
 
 DAEMON_NAME='snmp2amqp'
 
-init 		= cinit()
-logger 	= init.getLogger(DAEMON_NAME)
+import clogging
+logger = clogging.getLogger(DAEMON_NAME)
 
 RUN = False
 

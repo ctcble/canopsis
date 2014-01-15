@@ -20,8 +20,6 @@
 
 import sys
 from ctools import dynmodloads
-from cinit import cinit
-init = cinit()
 
 if len(sys.argv) != 2:
 	print "Usage: %s [init|update]" % sys.argv[0]
@@ -33,8 +31,8 @@ if action != "update" and action != "init":
 	print "Invalid option"
 	sys.exit(1)
 
-## Logger
-logger 	= init.getLogger("mongodb-conf", "INFO")
+import clogging
+logger 	= clogging.getLogger("mongodb-conf")
 
 ## Load
 modules = dynmodloads("~/opt/mongodb/load.d")

@@ -18,7 +18,6 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 
-#import logging
 from crecord import crecord
 try:
 	from caccount import caccount
@@ -27,7 +26,7 @@ except:
 
 class cgroup(crecord):
 	def __init__(self, record=None, account_ids=[], description=None, *args, **kargs):
-		crecord.__init__(self, *args, **kargs)
+		super(cgroup, self).__init__(*args, **kargs)
 		self.type = 'group'
 		self._id = '%s.%s' % (self.type,str(self.name))
 		self.account_ids = account_ids
@@ -37,7 +36,7 @@ class cgroup(crecord):
 		self.admin_group = 'group.CPS_account_admin'
 		
 		if isinstance(record, crecord):
-			crecord.__init__(self, _id=self._id, record=record, type=self.type, *args, **kargs)
+			super(cgroup, self).__init__(_id=self._id, record=record, type=self.type, *args, **kargs)
 
 	def dump(self,json=False):
 		self.data['account_ids'] = self.account_ids

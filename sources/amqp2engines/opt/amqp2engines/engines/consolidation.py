@@ -26,7 +26,6 @@ from cstorage import get_storage
 import pyperfstore2
 import pyperfstore2.utils
 import cevent
-import logging
 import json
 
 import time
@@ -48,7 +47,7 @@ class engine(cengine):
 
 	def pre_run(self):
 		self.storage = get_storage(namespace='object', account=caccount(user="root", group="root"))
-		self.manager = pyperfstore2.manager(logging_level=logging.INFO)
+		self.manager = pyperfstore2.manager()
 				
 		self.beat()
 

@@ -18,7 +18,6 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 
-#import logging
 from crecord import crecord
 from cstorage import cstorage
 from caccount import caccount
