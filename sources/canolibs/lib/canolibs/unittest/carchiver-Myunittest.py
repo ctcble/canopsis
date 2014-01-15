@@ -18,15 +18,12 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 
-import unittest, logging, time
+import unittest, time
 
 from carchiver import carchiver
 
 ARCHIVER = None
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)s %(levelname)s %(message)s',
-                    )
 
 class KnownValues(unittest.TestCase): 
 	def setUp(self):
@@ -34,7 +31,7 @@ class KnownValues(unittest.TestCase):
 
 	def test_01_Init(self):
 		global ARCHIVER
-		ARCHIVER = carchiver(namespace='unittest',  autolog=True, logging_level=logging.DEBUG)
+		ARCHIVER = carchiver(namespace='unittest',  autolog=True)
 		ARCHIVER.remove_all()
 
 	def test_02_Check(self):

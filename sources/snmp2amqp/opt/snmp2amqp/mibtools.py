@@ -18,7 +18,7 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 
-import sys, os, logging
+import sys, os, clogging
 
 mib_path="~/var/snmp/"
 
@@ -44,7 +44,7 @@ state_to_state = {
 class mib(object):
 	def __init__(self, name):
 		self.name = name
-		self.logger = logging.getLogger('mib')
+		self.logger = clogging.getLogger('mib')
 
 		self.logger.info("Load mib %s ..." % name)
 

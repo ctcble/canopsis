@@ -25,8 +25,6 @@ from ctools import parse_perfdata
 
 import time
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
 
 def check_perfdata(perf_data_raw):
 	perf_data = parse_perfdata(perf_data_raw)

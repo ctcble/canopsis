@@ -53,7 +53,7 @@ class cbrowser(ccmd):
 		self.account = account
 		self.namespace = namespace
 		self.crecord_type = crecord_type
-		self.storage = cstorage(account, namespace=namespace, logging_level=logging.INFO)
+		self.storage = cstorage(account, namespace=namespace)
 
 	def do_ls(self, crecord_type=None):
 		if   self.crecord_type:

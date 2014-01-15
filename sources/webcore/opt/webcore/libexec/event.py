@@ -18,7 +18,7 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 
-import logging, json
+import clogging, json
 
 import bottle
 from bottle import route, get, put, delete, request, HTTPError, post, response
@@ -34,7 +34,7 @@ import cevent
 #import protection function
 from libexec.auth import get_account, check_group_rights
 
-logger = logging.getLogger('Event')
+logger = clogging.getLogger('event')
 
 amqp = None
 group_managing_access = 'group.CPS_event_admin'

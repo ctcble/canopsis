@@ -18,7 +18,7 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 
-import logging
+import clogging
 import time
 import sys
 import os
@@ -41,7 +41,7 @@ CONFIG.read(os.path.expanduser('~/etc/cstorage.conf'))
 
 
 class cstorage(object):
-	def __init__(self, account, namespace='object', logging_level=logging.ERROR, mongo_host="127.0.0.1", mongo_port=27017, mongo_db='canopsis', mongo_autoconnect=True, groups=[], mongo_safe=True):
+	def __init__(self, account, namespace='object', mongo_host="127.0.0.1", mongo_port=27017, mongo_db='canopsis', mongo_autoconnect=True, groups=[], mongo_safe=True):
 
 		try:
 			self.mongo_host = CONFIG.get("master", "host")
@@ -66,8 +66,7 @@ class cstorage(object):
 		self.namespace = namespace
 		self.backend = None
 
-		self.logger = logging.getLogger('cstorage')
-		self.logger.setLevel(logging_level)
+		self.logger = clogging.getLogger('cstorage')
 		
 		self.gridfs_namespace = "binaries"
 
@@ -706,7 +705,7 @@ class cstorage(object):
 
 ## Cache storage
 STORAGES = {}
-def get_storage(namespace='object', account=None, logging_level=logging.INFO):
+def get_storage(namespace='object', account=None):
 	global STORAGES
 	try:
 		return STORAGES[namespace]
@@ -714,6 +713,6 @@ def get_storage(namespace='object', account=None, logging_level=logging.INFO):
 		if not account:
 			account = caccount()
 		
-		STORAGES[namespace] = cstorage(account, namespace=namespace, logging_level=logging_level)
+		STORAGES[namespace] = cstorage(account, namespace=namespace)
 		return STORAGES[namespace]
 

@@ -20,7 +20,6 @@
 
 import unittest
 import sys, os
-import logging
 
 sys.path.append(os.path.expanduser('~/opt/amqp2engines/engines/'))
 
@@ -30,7 +29,7 @@ from cengine import DROP
 
 class KnownValues(unittest.TestCase):
 	def setUp(self):
-		self.engine = event_filter.engine(logging_level=logging.DEBUG)
+		self.engine = event_filter.engine()
 		self.engine.beat()
 
 	def test_01_Init(self):

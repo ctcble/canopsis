@@ -19,13 +19,9 @@
 # ---------------------------------
 
 import unittest, sys, os
-import logging
+import clogging
 
-logging.basicConfig(level=logging.DEBUG,
-	format='%(name)s %(levelname)s %(message)s',
-)
-
-logger = logging.getLogger("operators")
+logger = clogging.getLogger("operators")
 
 sys.path.append(os.path.expanduser('~/opt/amqp2engines/engines/topology/'))
 

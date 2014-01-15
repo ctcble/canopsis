@@ -20,9 +20,6 @@
 
 import unittest
 
-import logging
-logging.basicConfig(format='%(asctime)s %(name)s %(levelname)s %(message)s')
-
 from cfile import cfile
 from cfile import get_cfile
 
@@ -34,7 +31,7 @@ from gridfs.errors import NoFile
 anonymous_account = caccount()
 root_account = caccount(user="root", group="root")
 
-storage = get_storage(account=root_account , namespace='unittest', logging_level=logging.DEBUG)
+storage = get_storage(account=root_account , namespace='unittest')
 
 sample_file_path = '/opt/canopsis/var/www/canopsis/themes/canopsis/resources/images/logo_small.png'
 sample_binary = open(sample_file_path, 'rb').read()

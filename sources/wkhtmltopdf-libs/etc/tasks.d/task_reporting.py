@@ -19,7 +19,6 @@
 # ---------------------------------
 from celery.task import task
 from celery.task.sets import subtask
-from cinit import cinit
 from caccount import caccount
 from crecord import crecord
 from cstorage import cstorage
@@ -28,16 +27,18 @@ from ctools import cleanTimestamp
 from datetime import date
 from celerylibs import decorators
 from random import randint
-import os, sys, json 
+import os, sys, json
 import time
 
 import hashlib
 
 import task_mail
-from wkhtmltopdf.wrapper import Wrapper 
+from wkhtmltopdf.wrapper import Wrapper
 
-init 	= cinit()
-logger 	= init.getLogger('Reporting Task') 
+import clogging
+
+logger 	= clogging.getLogger('Reporting Task')
+
 
 @task
 @decorators.log_task

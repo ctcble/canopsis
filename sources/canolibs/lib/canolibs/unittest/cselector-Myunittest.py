@@ -23,18 +23,13 @@ import time
 
 from cselector import cselector
 #from cselector import cselector_get, cselector_getall
-import logging
-
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)s %(levelname)s %(message)s',
-                    )
 
 from crecord import crecord
 from caccount import caccount
 from cstorage import get_storage
 
 root_account = caccount(user="root", group="root")
-storage = get_storage(account=root_account , namespace='unittest', logging_level=logging.DEBUG)
+storage = get_storage(account=root_account , namespace='unittest')
 selector = None
 
 class KnownValues(unittest.TestCase): 

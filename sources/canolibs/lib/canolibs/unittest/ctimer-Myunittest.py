@@ -18,19 +18,19 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 
-import unittest, logging
+import unittest
 import time
 from ctimer import ctimer
 
 mytimer = None
 
-class KnownValues(unittest.TestCase): 
+class KnownValues(unittest.TestCase):
 	def setUp(self):
 		pass
 
 	def test_1_Init(self):
 		global mytimer
-		mytimer = ctimer(logging_level=logging.DEBUG)
+		mytimer = ctimer()
 
 	def test_2_Start(self):
 		mytimer.start()

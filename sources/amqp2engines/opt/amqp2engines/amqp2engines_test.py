@@ -20,10 +20,8 @@
 
 
 import unittest
-import time, json, logging
+import time, json
 from bson import BSON
-
-import logging
 
 from camqp import camqp
 from cinit import cinit
@@ -36,9 +34,10 @@ sys.path.append(os.path.expanduser('~/opt/amqp2engines/engines/'))
 
 DAEMON_NAME="amqp2engines_test"
 
+import clogging
+
 init 	= cinit()
-logger 	= init.getLogger(DAEMON_NAME, level="INFO")
-#logger 	= init.getLogger(DAEMON_NAME)
+logger 	= clogging.getLogger(DAEMON_NAME)
 handler = init.getHandler(logger)
 
 def main():
@@ -64,7 +63,7 @@ def main():
 		sys.exit(1)
 	
 	try: 
-		engine = module.engine(logging_level=logging.DEBUG)	
+		engine = module.engine()
 	except Exception, e:
 		logger.error('Constructor exception raised for engine %s : %s' % (engine_name, e))
 		print traceback.format_exc()

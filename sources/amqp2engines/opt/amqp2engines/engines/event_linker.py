@@ -24,7 +24,6 @@ from crecord import crecord
 from cstorage import get_storage
 
 import cevent
-import logging
 import threading
 
 NAME='event_linker'
@@ -39,7 +38,7 @@ class engine(cengine):
 		super(engine, self).__init__(name=NAME, *args, **kwargs)
 
 		self.account = caccount(user='root', group='root')
-		self.storage = get_storage(namespace='events_trees', logging_level=logging.DEBUG, account=self.account)
+		self.storage = get_storage(namespace='events_trees', account=self.account)
 
 		# We don't need to lock this structure, the only write operation done
 		# is an append which is a thread-safe operation.

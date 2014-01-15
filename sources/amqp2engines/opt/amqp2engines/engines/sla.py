@@ -25,7 +25,6 @@ from cstorage import get_storage
 #from pyperfstore import mongostore
 import pyperfstore2
 import cevent
-import logging
 
 import time
 from datetime import datetime
@@ -36,14 +35,16 @@ NAME="sla"
 #states = {0: 0, 1:0, 2:0, 3:0, 4:0}
 
 states_str = ("Ok", "Warning", "Critical", "Unknown")
-states = {0: 0, 1:0, 2:0, 3:0}
+states = {0: 0, 1: 0, 2: 0, 3: 0}
+
 
 class engine(cengine):
+
 	def __init__(self, *args, **kargs):
-		cengine.__init__(self, name=NAME, *args, **kargs)
+		super(engine, self).__init__(name=NAME, *args, **kargs)
 		
 		self.create_queue = False
-				
+
 		self.beat_interval =  900
 		
 		# For debug
@@ -59,7 +60,7 @@ class engine(cengine):
 
 	def pre_run(self):
 		self.storage = get_storage(namespace='object', account=caccount(user="root", group="root"))
-		self.manager = pyperfstore2.manager(logging_level=self.logging_level)
+		self.manager = pyperfstore2.manager()
 		self.beat()
 		
 	def split_state(self, value):
@@ -115,7 +116,7 @@ class engine(cengine):
 		if not thd_crit_sla_timewindow:
 			thd_crit_sla_timewindow = self.thd_crit_sla_timewindow
 		if sla_output_tpl == "":
-			sla_output_tpl = self.default_sla_output_tpl	
+			sla_output_tpl = self.default_sla_output_tpl
 			
 		thd_warn_sla_timewindow = float(thd_warn_sla_timewindow)
 		thd_crit_sla_timewindow = float(thd_crit_sla_timewindow)

@@ -19,15 +19,11 @@
 # ---------------------------------
 
 import unittest
-import threading, time, json, logging
+import threading, time, json
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(name)s %(levelname)s %(message)s',
-                    )
-                    
 from cengine import cengine
 
-class KnownValues(unittest.TestCase): 
+class KnownValues(unittest.TestCase):
 	def setUp(self):
 		pass
 
