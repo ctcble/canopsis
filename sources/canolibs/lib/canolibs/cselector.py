@@ -69,7 +69,7 @@ class cselector(crecord):
 
 		self._ids = None
 
-		self.logger = clogging.getLogger('cselector')
+		self.logger = clogging.getLogger()
 		
 		## Init
 		if not record:

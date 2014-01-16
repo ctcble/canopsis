@@ -29,6 +29,7 @@ CONFIGURATION_FILE = 'configuration.conf'
 MANUAL_RECONFIGURATION = 'manual_reconfiguration'
 
 GLOBAL = 'GLOBAL'
+_logger = None
 
 
 class _ConfigurationFileSystemEventHandler(FileSystemEventHandler):
@@ -40,16 +41,19 @@ class _ConfigurationFileSystemEventHandler(FileSystemEventHandler):
     def __init__(self):
 
         super(_ConfigurationFileSystemEventHandler, self).__init__()
+
         self.manual_configuration = True
         self.configurationObservers = dict()
         self.config_parser = RawConfigParser()
         self.register_observer(
-            CONFIGURATION_FILE, self._check_configuration, True)
+            CONFIGURATION_FILE, self._check_configuration)
 
     def _check_configuration(self, src_path):
         """
         Observer method.
         """
+
+        _logger.debug('src_path: %s', src_path)
 
         self.config_parser.read(src_path)
 
@@ -64,6 +68,8 @@ class _ConfigurationFileSystemEventHandler(FileSystemEventHandler):
         """
         Call all observers.
         """
+
+        _logger.debug('')
 
         for configuration_file, observer in \
                 self.configurationObservers.iteritems():
@@ -89,6 +95,8 @@ class _ConfigurationFileSystemEventHandler(FileSystemEventHandler):
         Call observer bound to event src_path.
         """
 
+        _logger.debug('src_path: %s', src_path)
+
         src_path = os.path.expanduser(src_path)
 
         if not self.manual_configuration:
@@ -102,6 +110,8 @@ class _ConfigurationFileSystemEventHandler(FileSystemEventHandler):
         Call when a configuration file is modified.
         """
 
+        _logger.debug('event: %s', event)
+
         self._callObserver(event.src_path)
 
     def on_created(self, event):
@@ -109,31 +119,9 @@ class _ConfigurationFileSystemEventHandler(FileSystemEventHandler):
         Call when a configuration file is created.
         """
 
+        _logger.debug('event: ', event)
+
         self._callObserver(event.src_path)
-
-# singleton for configuration file system event handler
-_file_system_event_handler = _ConfigurationFileSystemEventHandler()
-# watchdog observer which register the singleton _file_system_event_handler in configuration directory content modification observers.
-_observer = Observer()
-_observer.schedule(
-    _file_system_event_handler, path=CONFIGURATION_DIRECTORY, recursive=False)
-_observer.start()
-
-import gevent
-import signal
-
-
-def _stop_observer():
-    """
-    Stop listening of configuration file event handler on configuration directory.
-    """
-
-    _observer.stop()
-    _observer.join()
-
-# stop the listening activity of this configuration file event handler at the end of current processus.
-gevent.signal(signal.SIGTERM, _stop_observer)
-gevent.signal(signal.SIGINT, _stop_observer)
 
 
 def register_observer(configuration_file, observer, call=False):
@@ -141,4 +129,33 @@ def register_observer(configuration_file, observer, call=False):
     Shortcut method which register an observer and bound it with input configuration_file.
     If call is True (False by default), the observer is called just after being registered.
     """
-    _file_system_event_handler.register_observer(configuration_file, observer, call)
+
+    _logger.debug(
+        'configuration_file: %s, observer: %s, call: %s',
+        configuration_file, observer, call)
+
+    _file_system_event_handler.register_observer(
+        configuration_file, observer, call)
+
+# singleton for configuration file system event handler
+_file_system_event_handler = _ConfigurationFileSystemEventHandler()
+# watchdog observer which register the singleton _file_system_event_handler in configuration directory content modification observers.
+_observer = Observer()
+
+_observer.schedule(
+    _file_system_event_handler, path=CONFIGURATION_DIRECTORY, recursive=False)
+_observer.start()
+
+import atexit
+
+
+@atexit.register
+def _stop_observer():
+    """
+    Stop listening of configuration file event handler on configuration directory.
+    """
+    if _logger is not None:
+        _logger.debug('')
+
+    _observer.stop()
+    _observer.join()

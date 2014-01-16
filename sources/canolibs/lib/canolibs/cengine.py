@@ -62,9 +62,8 @@ class cengine(multiprocessing.Process):
 		## Get from internal or external queue
 		self.next_balanced = next_balanced
 
-		self.logger = clogging.getLogger(name)
+		self.logger = clogging.getLogger("%s.%s" % (__name__, name))
 
-		
 		self.counter_error = 0
 		self.counter_event = 0
 		self.counter_worktime = 0
@@ -136,7 +135,7 @@ class cengine(multiprocessing.Process):
 		
 		from camqp import camqp
 		
-		self.amqp = camqp(logging_name="%s-amqp" % self.name, on_ready=ready)
+		self.amqp = camqp(logging_name="%s.%s-amqp" % (__name__, self.name), on_ready=ready)
 		
 		if self.create_queue:
 			self.new_amqp_queue(self.amqp_queue, self.routing_keys, self.on_amqp_event, self.exchange_name)	

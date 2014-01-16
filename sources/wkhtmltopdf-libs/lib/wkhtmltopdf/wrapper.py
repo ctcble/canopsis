@@ -17,18 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
-import os, logging, signal, time, json,random
+import os, clogging, signal, time, json,random
 from tempfile import mkstemp
 from subprocess import Popen
 from time import sleep
 from time import time
 
-logging.basicConfig()
 
 class Wrapper(object):
 	def __init__(self,filename, viewName, startTime, stopTime, account, wrapper_conf_file, orientation='Portrait', pagesize='A4'):
-		self.logger = logging.getLogger('[Wkhtml wrapper]')
-		self.logger.setLevel(logging.DEBUG)
+		self.logger = clogging.getLogger()
 
 		conf = open(wrapper_conf_file, "r").read()
 		self.settings = json.loads(conf)

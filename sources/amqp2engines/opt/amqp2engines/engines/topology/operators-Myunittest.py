@@ -21,7 +21,7 @@
 import unittest, sys, os
 import clogging
 
-logger = clogging.getLogger("operators")
+logger = clogging.getLogger()
 
 sys.path.append(os.path.expanduser('~/opt/amqp2engines/engines/topology/'))
 

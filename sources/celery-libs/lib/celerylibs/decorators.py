@@ -6,9 +6,9 @@ import time
 from camqp import camqp
 import cevent
 
-import logging
+import clogging
 
-logger = logging.getLogger('Task result to db')
+logger = clogging.getLogger()
 
 
 def simple_decorator(decorator):

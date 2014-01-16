@@ -34,7 +34,7 @@ sys.path.append(os.path.expanduser('~/opt/amqp2engines/engines/'))
 DAEMON_NAME="amqp2engines"
 
 init 	= cinit()
-logger 	= clogging.getLogger(DAEMON_NAME)
+logger 	= clogging.getLogger()
 handler = init.getHandler(logger)
 
 engines=[]

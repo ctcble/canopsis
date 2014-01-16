@@ -30,7 +30,7 @@ from cstorage import cstorage
 from cstorage import get_storage
 from crecord import crecord
 
-logger = clogging.getLogger("auth")
+logger = clogging.getLogger()
 
 #session variable
 session_accounts = {

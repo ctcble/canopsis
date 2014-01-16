@@ -37,7 +37,7 @@ from wkhtmltopdf.wrapper import Wrapper
 
 import clogging
 
-logger 	= clogging.getLogger('Reporting Task')
+logger 	= clogging.getLogger()
 
 
 @task

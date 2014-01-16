@@ -20,14 +20,6 @@
 
 import time
 import random
-import logging
-
-
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(name)s %(levelname)s %(message)s')
-
-
 import pyperfstore2
 
 interval = 300

@@ -44,7 +44,7 @@ state_to_state = {
 class mib(object):
 	def __init__(self, name):
 		self.name = name
-		self.logger = clogging.getLogger('mib')
+		self.logger = clogging.getLogger()
 
 		self.logger.info("Load mib %s ..." % name)
 

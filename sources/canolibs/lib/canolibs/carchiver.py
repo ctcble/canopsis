@@ -32,7 +32,7 @@ legend_type = ['soft', 'hard']
 class carchiver(object):
 	def __init__(self, namespace, storage=None, autolog=False):
 
-		self.logger = clogging.getLogger('carchiver')
+		self.logger = clogging.getLogger()
 
 		self.namespace = namespace
 		self.namespace_log = namespace + '_log'

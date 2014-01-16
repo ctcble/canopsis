@@ -32,7 +32,7 @@ if action != "update" and action != "init":
 	sys.exit(1)
 
 import clogging
-logger 	= clogging.getLogger("mongodb-conf")
+logger = clogging.getLogger()
 
 ## Load
 modules = dynmodloads("~/opt/mongodb/load.d")

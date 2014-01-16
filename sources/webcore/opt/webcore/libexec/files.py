@@ -46,7 +46,7 @@ from cfile import namespace
 # Import protection function
 from libexec.auth import get_account
 
-logger = clogging.getLogger('files')
+logger = clogging.getLogger()
 
 # Defines allowed mime types
 _allowed_mimetypes = {

@@ -8,7 +8,7 @@ from account import create_account
 
 storage = get_storage(namespace='object')
 
-logger = clogging.getLogger("auth-ldap")
+logger = clogging.getLogger()
 
 OPT_NETWORK_TIMEOUT = 1
 CONFIG=None

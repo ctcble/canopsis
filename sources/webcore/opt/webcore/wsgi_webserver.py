@@ -100,7 +100,7 @@ except Exception as err:
     print("Error when reading '{0}' ({1})".format(config_filename, err))
 
 ## Logger
-logger = clogging.getLogger("webserver")
+logger = clogging.getLogger()
 bottle.debug(debug)
 
 

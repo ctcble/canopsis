@@ -32,7 +32,7 @@ import bottle
 from bottle import route, get, delete, put, request
 from bottle import HTTPError, post, static_file, response
 
-logger = clogging.getLogger('calendar')
+logger = clogging.getLogger()
 
 from libexec.rest import *
 

@@ -66,7 +66,7 @@ class cstorage(object):
 		self.namespace = namespace
 		self.backend = None
 
-		self.logger = clogging.getLogger('cstorage')
+		self.logger = clogging.getLogger()
 		
 		self.gridfs_namespace = "binaries"
 

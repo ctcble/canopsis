@@ -27,7 +27,7 @@ from pwd import getpwnam
 DAEMON_NAME='snmp2amqp'
 
 import clogging
-logger = clogging.getLogger(DAEMON_NAME)
+logger = clogging.getLogger()
 
 RUN = False
 

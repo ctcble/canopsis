@@ -21,7 +21,7 @@
 import socket, time, clogging
 import re
 
-logger = clogging.getLogger('cevent')
+logger = clogging.getLogger()
 
 # Change default timeout from 1 to 3 , conflict with gunicorn
 socket.setdefaulttimeout(3)

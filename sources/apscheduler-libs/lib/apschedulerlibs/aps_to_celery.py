@@ -27,7 +27,7 @@ import cevent
 
 import clogging
 
-logger = clogging.getLogger('aps')
+logger = clogging.getLogger()
 
 def launch_celery_task(*args,**kwargs):
 	if kwargs.has_key('task') and kwargs.has_key('method'):

@@ -32,7 +32,7 @@ from crecord import crecord
 #import protection function
 from libexec.auth import get_account, check_group_rights
 
-logger = clogging.getLogger("ui_view")
+logger = clogging.getLogger()
 
 #group who have right to access 
 group_managing_access = ['group.CPS_view_admin','group.CPS_view']

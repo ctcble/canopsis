@@ -26,7 +26,7 @@ import polib
 import bottle
 from bottle import route, get, put, delete, request, HTTPError, response
 
-logger = clogging.getLogger("ui_locales")
+logger = clogging.getLogger()
 
 #########################################################################
 base_path = os.path.expanduser("~/var/www/canopsis/")

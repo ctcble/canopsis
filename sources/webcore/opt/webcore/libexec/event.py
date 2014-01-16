@@ -34,7 +34,7 @@ import cevent
 #import protection function
 from libexec.auth import get_account, check_group_rights
 
-logger = clogging.getLogger('event')
+logger = clogging.getLogger()
 
 amqp = None
 group_managing_access = 'group.CPS_event_admin'
@@ -44,7 +44,7 @@ group_managing_access = 'group.CPS_event_admin'
 ## load functions
 def load():
 	global amqp
-	amqp = camqp(logging_name="Event-amqp")
+	amqp = camqp(logging_name="%s-amqp" % __name__)
 	amqp.start()	
 	
 def unload():

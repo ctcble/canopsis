@@ -31,7 +31,7 @@ from ctools import clean_mfilter
 #import protection function
 from libexec.auth import get_account, check_group_rights
 
-logger = clogging.getLogger("rest")
+logger = clogging.getLogger()
 
 ctype_to_group_access = {
     'schedule': 'group.CPS_schedule_admin',

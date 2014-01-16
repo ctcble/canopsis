@@ -32,7 +32,7 @@ from crecord import crecord
 #import protection function
 from libexec.auth import get_account
 
-logger = clogging.getLogger("rights")
+logger = clogging.getLogger()
 
 #########################################################################
 

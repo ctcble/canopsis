@@ -25,7 +25,7 @@ import clogging
 class cwebservices(object):
 	def __init__(self, host="127.0.0.1", port=8082):
 
-		self.logger = clogging.getLogger('cwebservices')
+		self.logger = clogging.getLogger()
 
 		self.logger.debug('Init urlib object ...')
 		self.base_url = 'http://' + host + ':' + str(port)

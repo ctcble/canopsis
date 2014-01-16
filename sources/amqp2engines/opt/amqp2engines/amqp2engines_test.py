@@ -37,7 +37,7 @@ DAEMON_NAME="amqp2engines_test"
 import clogging
 
 init 	= cinit()
-logger 	= clogging.getLogger(DAEMON_NAME)
+logger 	= clogging.getLogger()
 handler = init.getHandler(logger)
 
 def main():

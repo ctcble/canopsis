@@ -43,7 +43,7 @@ class engine(cengine):
 	def pre_run(self):
 		self.manager = pyperfstore2.manager()
 
-		self.internal_amqp = camqp(logging_name="%s-internal-amqp" % self.name)
+		self.internal_amqp = camqp(logging_name="%s.%s-internal-amqp" % (__name__, self.name))
 		self.internal_amqp.add_queue(
 			queue_name=INTERNAL_QUEUE,
 			routing_keys=["#"],

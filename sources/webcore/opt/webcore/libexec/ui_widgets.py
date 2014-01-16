@@ -28,7 +28,7 @@ from bottle import route, get, put, delete, request, HTTPError, response
 from cstorage import get_storage
 from libexec.auth import get_account
 
-logger = clogging.getLogger("ui-widgets")
+logger = clogging.getLogger()
 
 #########################################################################
 

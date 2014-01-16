@@ -25,7 +25,7 @@ import clogging
 class ctimer(object):
 	def __init__(self):
 		self.started = False
-		self.logger = clogging.getLogger('ctimer')
+		self.logger = clogging.getLogger()
 		self.RUN = True
 
 	def start(self):

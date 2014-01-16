@@ -43,7 +43,7 @@ timestamps_file=os.path.expanduser('~/var/lib/ics2amqp/ics2amqp.timestamps')
 import clogging
 
 init 	= cinit()
-logger 	= clogging.getLogger(DAEMON_NAME)
+logger 	= clogging.getLogger()
 handler = init.getHandler(logger)
 
 sleep_time = 1

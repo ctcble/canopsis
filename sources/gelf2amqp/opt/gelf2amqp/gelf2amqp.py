@@ -32,7 +32,7 @@ DAEMON_NAME='gelf2amqp'
 import clogging
 
 init 	= cinit()
-logger 	= clogging.getLogger(DAEMON_NAME)
+logger 	= clogging.getLogger()
 handler = init.getHandler(logger)
 
 gelf_port = 5555

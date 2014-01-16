@@ -22,7 +22,6 @@ import cmd, readline
 
 import os, sys
 from datetime import datetime
-import logging
 
 from cstorage import cstorage
 import crecord

@@ -18,7 +18,7 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 
-import logging, math
+import math
 from cstorage import get_storage
 from caccount import caccount
 from datetime import timedelta

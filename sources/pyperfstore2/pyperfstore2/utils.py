@@ -18,7 +18,7 @@
 # along with Canopsis.  If not, see <http://www.gnu.org/licenses/>.
 # ---------------------------------
 import clogging
-logger = clogging.getLogger('utils')
+logger = clogging.getLogger()
 
 import zlib
 import time
@@ -546,7 +546,7 @@ def compress(points):
     last_interval = 0
     value = points[0][1]
 
-    if float.is_integer(value):
+    if not isinstance(value, int) and float.is_integer(value):
         value = int(value)
 
     data = [value]

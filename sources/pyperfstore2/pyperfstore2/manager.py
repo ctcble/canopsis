@@ -29,7 +29,7 @@ import pyperfstore2.utils as utils
 
 class manager(object):
     def __init__(self, retention=0, dca_min_length=250, cache=True, **kwargs):
-        self.logger = clogging.getLogger('manager')
+        self.logger = clogging.getLogger()
 
         # Store
         self.store = store(**kwargs)

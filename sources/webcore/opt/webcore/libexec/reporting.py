@@ -45,7 +45,7 @@ import task_reporting
 from libexec.auth import get_account
 from libexec.account import check_group_rights
 
-logger = clogging.getLogger('reporting')
+logger = clogging.getLogger()
 
 #group who have right to access 
 group_managing_access = ['group.CPS_reporting_admin']

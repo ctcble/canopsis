@@ -39,7 +39,7 @@ import pyperfstore2
 
 AMQP_HOST = "localhost"
 
-logger = clogging.getLogger("bench")
+logger = clogging.getLogger()
 amqp = camqp()
 
 storage = get_storage(namespace='events', account=caccount(user="root", group="root"))

@@ -41,7 +41,6 @@ class camqp(threading.Thread):
 		
 		self.logger = clogging.getLogger(logging_name)
 		
-		
 		self.host=host
 		self.port=port
 		self.userid=userid

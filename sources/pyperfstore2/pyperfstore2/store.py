@@ -44,7 +44,7 @@ class store(object):
         redis_sync_interval=10
     ):
 
-        self.logger = clogging.getLogger('store')
+        self.logger = clogging.getLogger()
         self.logger.debug(" + Init MongoDB Store")
 
         # Read db option from conf

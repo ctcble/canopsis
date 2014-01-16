@@ -17,9 +17,9 @@ from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.Utils import formatdate
 
-import logging
+import clogging
 
-logger	= logging.getLogger('Mail Task')
+logger	= clogging.getLogger()
 
 @task
 @decorators.log_task

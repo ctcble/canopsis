@@ -38,11 +38,11 @@ import pyperfstore2.utils
 
 manager = None
 
-logger = clogging.getLogger("perfstore")
+logger = clogging.getLogger()
 
 def load():
 	global manager
-	manager = pyperfstore2.manager(logging_level=logging.INFO)
+	manager = pyperfstore2.manager()
 
 def unload():
 	global manager
