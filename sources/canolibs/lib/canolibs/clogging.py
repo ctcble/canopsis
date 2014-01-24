@@ -53,8 +53,9 @@ class CanopsisLogger(logging.Logger):
 
         super(CanopsisLogger, self).__init__(name, level)
 
-        filename = name.replace('.', os.path.sep) + '.log'
-        path = os.path.join(LOG_DIRECTORY, filename)
+        path = self.getLogFilePath()
+
+        # create log file if not exists
         if not os.path.exists(path):
             directory = os.path.dirname(path)
             if not os.path.exists(directory):
@@ -63,8 +64,29 @@ class CanopsisLogger(logging.Logger):
         self.handler = logging.FileHandler(path, 'a')
         self.addHandler()
 
+    def getLogPath(self):
+        """
+        Get log file path corresponding to its name.
+        """
+        filename = self.name.replace('.', os.path.sep) + '.log'
+        result = os.path.join(LOG_DIRECTORY, filename)
+
+        return result
+
     def debug(self, msg, *args, **kwargs):
         self.log(logging.DEBUG, msg, *args, **kwargs)
+
+    def info(self, msg, *args, **kwargs):
+        self.log(logging.INFO, msg, *args, **kwargs)
+
+    def warning(self, msg, *args, **kwargs):
+        self.log(logging.WARNING, msg, *args, **kwargs)
+
+    def critical(self, msg, *args, **kwargs):
+        self.log(logging.CRITICAL, msg, *args, **kwargs)
+
+    def error(self, msg, *args, **kwargs):
+        self.log(logging.ERROR, msg, *args, **kwargs)
 
     def log(self, level, msg, *args, **kwargs):
         """
